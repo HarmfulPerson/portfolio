@@ -87,7 +87,7 @@ export function GridLightning({ viewW, viewH, techTagHitRef, cardRectsRef, onCar
 
         bolt.segments.push({ x: newX, y: bolt.headY });
 
-        if (tagRectsCache) {
+        if (!isMobile && tagRectsCache) {
           for (let t = 0; t < tagRectsCache.length; t++) {
             const r = tagRectsCache[t];
             if (r.w === 0) continue;

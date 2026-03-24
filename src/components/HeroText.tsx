@@ -52,15 +52,16 @@ const MemoClipPath = memo(function MemoClipPath({ id, fillOrder, count, cols, ce
 });
 
 export function HeroText({ fillProgress, footerProgress, scrollY, viewW, viewH, mounted, designGlowColor, nameGlowColor }: HeroTextProps) {
-  const cellSize = 10;
-  const textW = 700;
-  const textH = 200;
+  const cellSize = isMobile ? 20 : 10;
+  const textW = isMobile ? 350 : 700;
+  const textH = isMobile ? 100 : 200;
   const cols = Math.ceil(textW / cellSize);
   const rows = Math.ceil(textH / cellSize);
   const total = cols * rows;
 
   const fillOrder = useMemo(() => generateFillOrder(cols, rows, 777), [cols, rows]);
-  const filledCount = Math.min(total, Math.floor(fillProgress * total / 20) * 20);
+  const quantize = isMobile ? 10 : 20;
+  const filledCount = Math.min(total, Math.floor(fillProgress * total / quantize) * quantize);
 
   const fp = easeInOutCubic(Math.max(0, Math.min(1, footerProgress)));
 
@@ -92,9 +93,10 @@ export function HeroText({ fillProgress, footerProgress, scrollY, viewW, viewH, 
   const suffixFinalLeft = endX + designEndWidth + 8;
 
   const nameW = Math.round(Math.min(500, viewW * 0.6) / 10) * 10;
-  const nameH = 80;
-  const nameCols = nameW / cellSize;
-  const nameRows = nameH / cellSize;
+  const nameH = isMobile ? 60 : 80;
+  const nameCellSize = isMobile ? 20 : 10;
+  const nameCols = Math.ceil(nameW / nameCellSize);
+  const nameRows = Math.ceil(nameH / nameCellSize);
   const nameTotal = nameCols * nameRows;
   const nameFillOrder = useMemo(() => generateFillOrder(nameCols, nameRows, 1337), [nameCols, nameRows]);
 
@@ -122,7 +124,7 @@ export function HeroText({ fillProgress, footerProgress, scrollY, viewW, viewH, 
   return (
     <div className="fixed inset-0 pointer-events-none select-none z-[3]">
       {nameFilledCount < nameTotal && (
-        <MemoClipPath id="heroNameClip" fillOrder={nameFillOrder} count={nameFilledCount} cols={nameCols} cellSize={cellSize} />
+        <MemoClipPath id="heroNameClip" fillOrder={nameFillOrder} count={nameFilledCount} cols={nameCols} cellSize={nameCellSize} />
       )}
 
       {heroFadeOpacity > 0.01 && mounted && nameFilledCount > 0 && (

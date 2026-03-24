@@ -108,7 +108,7 @@ export default function Home() {
     let lastSet = 0;
 
     const isMobile = window.innerWidth < 768;
-    const threshold = isMobile ? 6 : 3;
+    const threshold = isMobile ? 10 : 3;
 
     const tick = () => {
       if (!running) return;

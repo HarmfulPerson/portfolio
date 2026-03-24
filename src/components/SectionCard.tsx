@@ -64,14 +64,16 @@ export function SectionCard({
     const ax = isLeft ? rx + rw : rx;
     const ay = ry + rh / 2;
 
+    const lax = ax - rx;
+    const lay = ay - ry;
     const rectD = isLeft
-      ? `M ${ax} ${ay} L ${ax} ${ry + rh} L ${rx} ${ry + rh} L ${rx} ${ry} L ${ax} ${ry} L ${ax} ${ay}`
-      : `M ${ax} ${ay} L ${ax} ${ry + rh} L ${rx + rw} ${ry + rh} L ${rx + rw} ${ry} L ${ax} ${ry} L ${ax} ${ay}`;
+      ? `M ${lax} ${lay} L ${lax} ${rh} L 0 ${rh} L 0 0 L ${lax} 0 L ${lax} ${lay}`
+      : `M ${lax} ${lay} L ${lax} ${rh} L ${rw} ${rh} L ${rw} 0 L ${lax} 0 L ${lax} ${lay}`;
 
     borderSvg = (
       <svg
         className="fixed pointer-events-none"
-        style={{ left: 0, top: 0, width: viewW, height: viewH, zIndex: 10, overflow: "visible" }}
+        style={{ left: rx, top: ry, width: rw + 2, height: rh + 2, zIndex: 10, overflow: "visible" }}
       >
         <path
           d={rectD}
