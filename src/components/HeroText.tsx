@@ -70,8 +70,9 @@ export function HeroText({ fillProgress, footerProgress, scrollY, viewW, viewH, 
 
   const startX = viewW / 2;
   const startY = viewH / 2;
-  const endX = 40;
-  const endY = Math.round((viewH - 18) / 10) * 10;
+  const isMobile = viewW < 640;
+  const endX = isMobile ? 20 : 40;
+  const endY = Math.round((viewH - (isMobile ? 30 : 18)) / 10) * 10;
 
   const currentX = startX + (endX - startX) * fp;
   const currentY = startY + (endY - startY) * fp;

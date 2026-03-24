@@ -48,9 +48,9 @@ export function Footer({ scrollY, footerStart, viewH, viewW, centerX }: FooterPr
             <span className="hidden sm:block text-xs tracking-[0.15em] uppercase font-semibold" style={{ color: theme.accent }}>
               hello@marcin.dev
             </span>
-            <div className="flex gap-4">
+            <div className="flex gap-2 sm:gap-4">
               {["GitHub", "LinkedIn", "Twitter"].map((link) => (
-                <span key={link} className="text-[10px] tracking-[0.15em] uppercase" style={{ color: theme.text.secondary }}>
+                <span key={link} className="text-[8px] sm:text-[10px] tracking-[0.1em] sm:tracking-[0.15em] uppercase" style={{ color: theme.text.secondary }}>
                   {link}
                 </span>
               ))}

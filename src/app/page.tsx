@@ -194,8 +194,11 @@ export default function Home() {
   const designFontSize = Math.min(200, viewW * 0.12) + (14 - Math.min(200, viewW * 0.12)) * fpEased;
   const designVisualW = designFontSize * 0.6 * 6;
   const designVisualH = designFontSize;
-  const designCX = viewW / 2 + (40 - viewW / 2) * fpEased;
-  const designCY = viewH / 2 + (Math.round((viewH - 18) / 10) * 10 - viewH / 2) * fpEased;
+  const designEndX = isMobileDesign ? 20 : 40;
+  const designCX = viewW / 2 + (designEndX - viewW / 2) * fpEased;
+  const isMobileDesign = viewW < 640;
+  const designEndY = Math.round((viewH - (isMobileDesign ? 30 : 18)) / 10) * 10;
+  const designCY = viewH / 2 + (designEndY - viewH / 2) * fpEased;
   const designTransX = -50 * (1 - fpEased);
   const designLeft = designCX + (designTransX / 100) * designVisualW;
   const designTransY = -50 * (1 - fpEased);
