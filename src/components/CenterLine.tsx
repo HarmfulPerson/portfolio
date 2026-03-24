@@ -22,6 +22,8 @@ export function CenterLine({ accentHeight, viewH, centerX }: CenterLineProps) {
             height: Math.min(viewH, Math.max(0, accentHeight)),
             background: theme.accent,
             opacity: theme.line.accentOpacity,
+            transition: "height 0.15s linear",
+            willChange: "height",
           }}
         />
       )}

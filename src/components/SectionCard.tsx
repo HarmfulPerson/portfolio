@@ -73,7 +73,7 @@ export function SectionCard({
     borderSvg = (
       <svg
         className="fixed pointer-events-none"
-        style={{ left: rx, top: ry, width: rw + 2, height: rh + 2, zIndex: 10, overflow: "visible" }}
+        style={{ left: rx, top: ry, width: rw + 2, height: rh + 2, zIndex: 10, overflow: "visible", transition: "top 0.15s linear" }}
       >
         <path
           d={rectD}
@@ -104,7 +104,8 @@ export function SectionCard({
             borderRadius: "50%",
             background: activeColor,
             opacity: Math.min(0.7, threadProgress),
-            transition: "background 0.4s ease",
+            transition: "background 0.4s ease, top 0.15s linear",
+            willChange: "top",
             zIndex: 9,
           }}
         />
@@ -120,6 +121,7 @@ export function SectionCard({
             height: 100,
             zIndex: 9,
             overflow: "visible",
+            transition: "top 0.15s linear",
           }}
         >
           <path
@@ -147,6 +149,7 @@ export function SectionCard({
             top: snappedCardY,
             width: CARD_W,
             height: CARD_H,
+            transition: "top 0.15s linear",
             zIndex: 11,
             opacity: textOpacity,
             display: "flex",
