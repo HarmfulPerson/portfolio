@@ -19,12 +19,10 @@ function generateFillOrder(cols: number, rows: number, seed: number): number[] {
   const total = cols * rows;
   const indices = Array.from({ length: total }, (_, i) => i);
   const rand = seededRandom(seed);
-
   for (let i = total - 1; i > 0; i--) {
     const j = Math.floor(rand() * (i + 1));
     [indices[i], indices[j]] = [indices[j], indices[i]];
   }
-
   return indices;
 }
 
@@ -53,16 +51,6 @@ const MemoClipPath = memo(function MemoClipPath({ id, fillOrder, count, cols, ce
 
 export function HeroText({ fillProgress, footerProgress, scrollY, viewW, viewH, mounted, designGlowColor, nameGlowColor }: HeroTextProps) {
   const isMobile = viewW < 640;
-  const cellSize = isMobile ? 20 : 10;
-  const textW = isMobile ? 350 : 700;
-  const textH = isMobile ? 100 : 200;
-  const cols = Math.ceil(textW / cellSize);
-  const rows = Math.ceil(textH / cellSize);
-  const total = cols * rows;
-
-  const fillOrder = useMemo(() => generateFillOrder(cols, rows, 777), [cols, rows]);
-  const quantize = isMobile ? 10 : 20;
-  const filledCount = Math.min(total, Math.floor(fillProgress * total / quantize) * quantize);
 
   const fp = easeInOutCubic(Math.max(0, Math.min(1, footerProgress)));
 
@@ -82,15 +70,21 @@ export function HeroText({ fillProgress, footerProgress, scrollY, viewW, viewH, 
   const translateY = -50 * (1 - fp);
 
   const startOpacity = 0.12;
-  const endOpacity = 1;
-  const currentOpacity = startOpacity + (endOpacity - startOpacity) * fp;
-
-  const showClip = fp < 0.95 && filledCount < total;
+  const currentOpacity = startOpacity + (1 - startOpacity) * fp;
 
   const showSuffix = fp > 0.94;
-
   const designEndWidth = endFontSize * 0.6 * 6 * (1 - 0.04);
   const suffixFinalLeft = endX + designEndWidth + 8;
+
+  const cellSize = 10;
+  const textW = 700;
+  const textH = 200;
+  const cols = Math.ceil(textW / cellSize);
+  const rows = Math.ceil(textH / cellSize);
+  const total = cols * rows;
+  const fillOrder = useMemo(() => generateFillOrder(cols, rows, 777), [cols, rows]);
+  const filledCount = isMobile ? total : Math.min(total, Math.floor(fillProgress * total / 20) * 20);
+  const showClip = !isMobile && fp < 0.95 && filledCount < total;
 
   const nameW = Math.round(Math.min(500, viewW * 0.6) / 10) * 10;
   const nameH = isMobile ? 60 : 80;
@@ -105,6 +99,10 @@ export function HeroText({ fillProgress, footerProgress, scrollY, viewW, viewH, 
   useEffect(() => {
     if (nameStarted.current) return;
     nameStarted.current = true;
+    if (isMobile) {
+      setNameFill(1);
+      return;
+    }
     const start = performance.now();
     const duration = 1200;
     const tick = (now: number) => {
@@ -113,21 +111,24 @@ export function HeroText({ fillProgress, footerProgress, scrollY, viewW, viewH, 
       if (t < 1) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
-  }, []);
+  }, [isMobile]);
 
-  const nameFilledCount = Math.floor(easeInOutCubic(nameFill) * nameTotal);
+  const nameFilledCount = isMobile ? nameTotal : Math.floor(easeInOutCubic(nameFill) * nameTotal);
   const nameX = Math.round(viewW / 2 / 10) * 10;
   const nameY = Math.round(viewH * 0.38 / 10) * 10;
   const heroFadeOpacity = Math.max(0, 1 - scrollY / (viewH * 0.4));
   const heroParallax = scrollY * 0.3;
 
+  const showNameClip = !isMobile && nameFilledCount < nameTotal;
+  const designVisible = isMobile ? fillProgress > 0.05 : filledCount > 0;
+
   return (
     <div className="fixed inset-0 pointer-events-none select-none z-[3]">
-      {nameFilledCount < nameTotal && (
+      {showNameClip && (
         <MemoClipPath id="heroNameClip" fillOrder={nameFillOrder} count={nameFilledCount} cols={nameCols} cellSize={nameCellSize} />
       )}
 
-      {heroFadeOpacity > 0.01 && mounted && nameFilledCount > 0 && (
+      {heroFadeOpacity > 0.01 && mounted && (isMobile || nameFilledCount > 0) && (
         <div
           style={{
             position: "absolute",
@@ -138,9 +139,7 @@ export function HeroText({ fillProgress, footerProgress, scrollY, viewW, viewH, 
             width: nameW,
             height: nameH,
             padding: "10px 0",
-            ...(nameFilledCount < nameTotal ? {
-              clipPath: "url(#heroNameClip)",
-            } : {}),
+            ...(showNameClip ? { clipPath: "url(#heroNameClip)" } : {}),
           }}
         >
           <div
@@ -170,10 +169,10 @@ export function HeroText({ fillProgress, footerProgress, scrollY, viewW, viewH, 
         </div>
       )}
 
-      {filledCount > 0 && showClip && (
+      {designVisible && showClip && (
         <MemoClipPath id="heroFillClip" fillOrder={fillOrder} count={filledCount} cols={cols} cellSize={cellSize} />
       )}
-      {filledCount > 0 && <div
+      {designVisible && <div
         className="font-mono font-black uppercase leading-none"
         style={{
           position: "absolute",
@@ -183,7 +182,7 @@ export function HeroText({ fillProgress, footerProgress, scrollY, viewW, viewH, 
           fontSize: currentFontSize,
           letterSpacing: "-0.04em",
           color: designGlowColor || theme.accent,
-          opacity: currentOpacity,
+          opacity: isMobile ? Math.min(currentOpacity, fillProgress * 2) : currentOpacity,
           whiteSpace: "nowrap",
           transition: "color 0.4s ease",
           ...(showClip ? {
