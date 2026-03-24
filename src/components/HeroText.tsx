@@ -52,6 +52,7 @@ const MemoClipPath = memo(function MemoClipPath({ id, fillOrder, count, cols, ce
 });
 
 export function HeroText({ fillProgress, footerProgress, scrollY, viewW, viewH, mounted, designGlowColor, nameGlowColor }: HeroTextProps) {
+  const isMobile = viewW < 640;
   const cellSize = isMobile ? 20 : 10;
   const textW = isMobile ? 350 : 700;
   const textH = isMobile ? 100 : 200;
@@ -71,7 +72,6 @@ export function HeroText({ fillProgress, footerProgress, scrollY, viewW, viewH, 
 
   const startX = viewW / 2;
   const startY = viewH / 2;
-  const isMobile = viewW < 640;
   const endX = isMobile ? 20 : 40;
   const endY = Math.round((viewH - (isMobile ? 30 : 18)) / 10) * 10;
 
