@@ -24,6 +24,8 @@ interface SectionCardProps {
   titleSuffix?: React.ReactNode;
   contactLinks?: { label: string; href: string }[];
   glowColor?: string | null;
+  cardW?: number;
+  cardH?: number;
 }
 
 export function SectionCard({
@@ -43,8 +45,11 @@ export function SectionCard({
   titleSuffix,
   contactLinks,
   glowColor,
+  cardW: cardWProp,
+  cardH: cardHProp,
 }: SectionCardProps) {
-  const { width: CARD_W, height: CARD_H } = theme.card;
+  const CARD_W = cardWProp || theme.card.width;
+  const CARD_H = cardHProp || theme.card.height;
 
   const snappedCardY = Math.round(cardScreenY / 10) * 10;
   const snappedDotY = Math.round(dotScreenY / 10) * 10;

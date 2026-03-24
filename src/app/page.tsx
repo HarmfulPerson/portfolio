@@ -18,7 +18,9 @@ import { TechTags } from "@/components/TechTags";
 import { GridLightning } from "@/components/GridLightning";
 import type { TechTagHit } from "@/components/TechTags";
 
-const { width: CARD_W, height: CARD_H, gap } = theme.card;
+const DESKTOP_CARD_W = theme.card.width;
+const DESKTOP_CARD_H = theme.card.height;
+const DESKTOP_GAP = theme.card.gap;
 
 const CONTACT_LINKS = [
   { label: "GitHub", href: "https://github.com/marcinwieczorek" },
@@ -174,6 +176,11 @@ export default function Home() {
     cell.addEventListener("animationend", () => cell.remove());
   }, []);
 
+  const isMobile = viewW < 640;
+  const CARD_W = isMobile ? Math.round((viewW - 40) / 10) * 10 : DESKTOP_CARD_W;
+  const CARD_H = isMobile ? 180 : DESKTOP_CARD_H;
+  const gap = isMobile ? 20 : DESKTOP_GAP;
+
   const sectionSpan = viewH * 0.9;
   const totalHeight = viewH * 1.6 + SECTIONS.length * sectionSpan + viewH * 1.2;
   const centerX = Math.round(viewW / 2 / 10) * 10;
@@ -207,8 +214,12 @@ export default function Home() {
 
   const paths = useMemo(() => {
     return SECTIONS.map((_, i) => {
-      const isLeft = i % 2 === 0;
-      const rawCardX = isLeft ? Math.max(20, centerX - CARD_W - gap) : Math.min(viewW - CARD_W - 20, centerX + gap);
+      const isLeft = isMobile ? false : i % 2 === 0;
+      const rawCardX = isMobile
+        ? Math.round((viewW - CARD_W) / 2 / 10) * 10
+        : isLeft
+          ? Math.max(20, centerX - CARD_W - gap)
+          : Math.min(viewW - CARD_W - 20, centerX + gap);
       const cardX = Math.round(rawCardX / 10) * 10;
       const nearEdgeX = isLeft ? cardX + CARD_W : cardX;
 
@@ -371,7 +382,9 @@ export default function Home() {
                   index={i}
                   title={section.title}
                   text={section.text}
-                  isLeft={i % 2 === 0}
+                  isLeft={isMobile ? false : i % 2 === 0}
+                  cardW={CARD_W}
+                  cardH={CARD_H}
                   pathData={pathData}
                   threadProgress={threadProgress}
                   borderProgress={borderProgress}
@@ -391,6 +404,8 @@ export default function Home() {
                     cardX={pathData.cardX}
                     cardScreenY={cardScreenY}
                     onProjectClick={setSelectedProject}
+                    cardW={CARD_W}
+                    cardH={CARD_H}
                   />
                 )}
               </div>

@@ -134,6 +134,8 @@ export function TechTags({ scrollY, viewW, viewH, centerX, onCursorColor, hitRef
 
   const now = Date.now();
 
+  if (viewW < 640) return null;
+
   return (
     <div className="fixed inset-0 pointer-events-none select-none z-[3]">
       {TAGS.map((tag, i) => {

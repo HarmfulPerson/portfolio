@@ -9,6 +9,8 @@ interface ProjectGridProps {
   cardX: number;
   cardScreenY: number;
   onProjectClick?: (index: number) => void;
+  cardW?: number;
+  cardH?: number;
 }
 
 function getProjectPositions(cardW: number, cardH: number) {
@@ -34,7 +36,9 @@ function getProjectPositions(cardW: number, cardH: number) {
 
 const positions = getProjectPositions(theme.card.width, theme.card.height);
 
-export function ProjectGrid({ opacity, cardX, cardScreenY, onProjectClick }: ProjectGridProps) {
+export function ProjectGrid({ opacity, cardX, cardScreenY, onProjectClick, cardW, cardH }: ProjectGridProps) {
+  const w = cardW || theme.card.width;
+  const h = cardH || theme.card.height;
   if (opacity < 0.01) return null;
 
   return (
@@ -43,8 +47,8 @@ export function ProjectGrid({ opacity, cardX, cardScreenY, onProjectClick }: Pro
       style={{
         left: cardX,
         top: Math.round(cardScreenY / 10) * 10,
-        width: theme.card.width,
-        height: theme.card.height,
+        width: w,
+        height: h,
         zIndex: 12,
         opacity,
       }}
