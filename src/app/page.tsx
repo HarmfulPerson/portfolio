@@ -274,6 +274,31 @@ export default function Home() {
   }, [scrollY, viewH, sectionSpan, firstSectionStart, footerStart]);
 
   const scrollAnimRef = useRef(0);
+  const sectionTriggersRef = useRef<{ [key: number]: number }>({});
+  const [animTick, setAnimTick] = useState(0);
+
+  useEffect(() => {
+    let raf: number;
+    let running = true;
+    const loop = () => {
+      if (!running) return;
+      const triggers = sectionTriggersRef.current;
+      const now = performance.now();
+      let anyAnimating = false;
+      for (const key in triggers) {
+        if ((now - triggers[key]) / 1000 < 1.5) {
+          anyAnimating = true;
+          break;
+        }
+      }
+      if (anyAnimating) {
+        setAnimTick((n) => n + 1);
+      }
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => { running = false; cancelAnimationFrame(raf); };
+  }, []);
   const handleNavigate = useCallback((idx: number) => {
     const container = containerRef.current;
     if (!container) return;
@@ -342,31 +367,30 @@ export default function Home() {
             const sectionStart = firstSectionStart + i * sectionSpan;
             const elapsed = scrollY - sectionStart;
 
-            const p1 = sectionSpan * 0.25;
-            const p2 = sectionSpan * 0.45;
-            const p3 = sectionSpan * 0.55;
-
             if (elapsed < -10) return null;
 
-            let threadProgress = 0;
-            if (elapsed >= 0 && elapsed < p1) threadProgress = easeInOutCubic(elapsed / p1);
-            else if (elapsed >= p1) threadProgress = 1;
-
-            const autoReveal = threadProgress >= 1;
-            let borderProgress = 0;
-            let textOpacity = 0;
-
-            if (autoReveal) {
-              borderProgress = 1;
-              textOpacity = 1;
-            } else {
-              if (elapsed >= p1 && elapsed < p2) borderProgress = easeInOutCubic((elapsed - p1) / (p2 - p1));
-              else if (elapsed >= p2) borderProgress = 1;
-
-              textOpacity = elapsed >= p2 && elapsed < p3
-                ? easeInOutCubic((elapsed - p2) / (p3 - p2))
-                : elapsed >= p3 ? 1 : 0;
+            if (elapsed >= 0 && !sectionTriggersRef.current[i]) {
+              sectionTriggersRef.current[i] = performance.now();
             }
+
+            const triggerTime = sectionTriggersRef.current[i];
+            if (!triggerTime) return null;
+
+            const timeElapsed = (performance.now() - triggerTime) / 1000;
+
+            const threadDuration = 0.8;
+            const borderDelay = 0.6;
+            const borderDuration = 0.5;
+            const textDelay = 0.9;
+            const textDuration = 0.4;
+
+            const threadProgress = Math.min(1, easeInOutCubic(Math.min(1, timeElapsed / threadDuration)));
+            const borderProgress = timeElapsed > borderDelay
+              ? Math.min(1, easeInOutCubic(Math.min(1, (timeElapsed - borderDelay) / borderDuration)))
+              : 0;
+            const textOpacity = timeElapsed > textDelay
+              ? Math.min(1, easeInOutCubic(Math.min(1, (timeElapsed - textDelay) / textDuration)))
+              : 0;
 
             if (threadProgress < 0.005) return null;
 
@@ -374,9 +398,10 @@ export default function Home() {
             if (!pathData) return null;
 
             const stickyY = Math.round((viewH * 0.5 - CARD_H / 2) / 10) * 10;
-            const releasePoint = sectionStart + p3;
-            const scrollPastRelease = scrollY - releasePoint;
-            const cardScreenY = elapsed < p3 ? stickyY : stickyY - scrollPastRelease;
+            const animDone = timeElapsed > 1.3;
+            const releaseScroll = sectionStart + sectionSpan * 0.3;
+            const scrollPastRelease = scrollY - releaseScroll;
+            const cardScreenY = (!animDone || scrollPastRelease < 0) ? stickyY : stickyY - scrollPastRelease;
             const dotScreenY = cardScreenY + CARD_H / 2;
 
             const hasProjects = "hasProjects" in section && section.hasProjects;
