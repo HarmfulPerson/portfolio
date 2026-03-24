@@ -352,13 +352,21 @@ export default function Home() {
             if (elapsed >= 0 && elapsed < p1) threadProgress = easeInOutCubic(elapsed / p1);
             else if (elapsed >= p1) threadProgress = 1;
 
+            const autoReveal = threadProgress >= 1;
             let borderProgress = 0;
-            if (elapsed >= p1 && elapsed < p2) borderProgress = easeInOutCubic((elapsed - p1) / (p2 - p1));
-            else if (elapsed >= p2) borderProgress = 1;
+            let textOpacity = 0;
 
-            const textOpacity = elapsed >= p2 && elapsed < p3
-              ? easeInOutCubic((elapsed - p2) / (p3 - p2))
-              : elapsed >= p3 ? 1 : 0;
+            if (autoReveal) {
+              borderProgress = 1;
+              textOpacity = 1;
+            } else {
+              if (elapsed >= p1 && elapsed < p2) borderProgress = easeInOutCubic((elapsed - p1) / (p2 - p1));
+              else if (elapsed >= p2) borderProgress = 1;
+
+              textOpacity = elapsed >= p2 && elapsed < p3
+                ? easeInOutCubic((elapsed - p2) / (p3 - p2))
+                : elapsed >= p3 ? 1 : 0;
+            }
 
             if (threadProgress < 0.005) return null;
 

@@ -81,7 +81,7 @@ export function SectionCard({
           stroke={activeColor}
           strokeWidth={1}
           strokeLinejoin="miter"
-          style={{ transition: "stroke 0.4s ease" }}
+          style={{ transition: "stroke 0.4s ease, stroke-dashoffset 0.6s ease" }}
           pathLength={1}
           strokeDasharray={1}
           strokeDashoffset={1 - borderProgress}
@@ -141,7 +141,7 @@ export function SectionCard({
 
       {borderSvg}
 
-      {textOpacity > 0 && (
+      {threadProgress > 0.01 && (
         <div
           className="fixed pointer-events-none font-mono"
           style={{
@@ -149,7 +149,7 @@ export function SectionCard({
             top: snappedCardY,
             width: CARD_W,
             height: CARD_H,
-            transition: "top 0.15s linear",
+            transition: "top 0.15s linear, opacity 0.5s ease",
             zIndex: 11,
             opacity: textOpacity,
             display: "flex",
